@@ -20,7 +20,7 @@ import org.openjdk.jmh.runner.RunnerException;
 
 import de.squareys.nhbench.main.NeighborhoodBenchmarks;
 
-public class NeighborhoodBenchmark {
+public class BufferedRectangularNhBenchmark {
 
 	@State(Scope.Benchmark)
 	public static class ImgState {
@@ -70,6 +70,6 @@ public class NeighborhoodBenchmark {
 	 *             thrown when jmh runs into trouble
 	 */
 	public static void main(String[] args) throws RunnerException {
-		NeighborhoodBenchmarks.runBenchmark(NeighborhoodBenchmark.class.getSimpleName());
+		NeighborhoodBenchmarks.runBenchmark(BufferedRectangularNhBenchmark.class.getSimpleName());
 	}
 }
