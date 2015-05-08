@@ -29,9 +29,12 @@ public class NeighborhoodBenchmark {
 	}
 	
 	@State(Scope.Benchmark)
-	public static class NeighborhoodState {
+	public static class NeighborhoodState extends ImgState {
 		public final Img<FloatType> img = new ArrayImgFactory<FloatType>().create(new int[] {
 				100, 100 }, new FloatType());
+		public final BufferedRectangularNeighborhood<FloatType> neighborhood = new BufferedRectangularNeighborhood<FloatType>(
+				img, new OutOfBoundsBorderFactory<FloatType, RandomAccessibleInterval<FloatType>>(),
+				new long[] { 3, 3 });
 	}
 	
 	@Benchmark
@@ -43,18 +46,15 @@ public class NeighborhoodBenchmark {
 				new long[] { 3, 3 });
 		
 		// use neighborhood so that it doesn't get optimized out
+		// TODO is this really neccessary
 		return (int) (neighborhood.dimension(0) + 1);
 	}
 	
 	@Benchmark
 	@BenchmarkMode(Mode.All)
 	@OutputTimeUnit(TimeUnit.MICROSECONDS)
-	public void iterateThroughNeighborhood(ImgState imgState) {
-		BufferedRectangularNeighborhood<FloatType> neighborhood = new BufferedRectangularNeighborhood<FloatType>(
-				imgState.img, new OutOfBoundsBorderFactory<FloatType, RandomAccessibleInterval<FloatType>>(),
-				new long[] { 3, 3 });
-		
-		Iterator<FloatType> itor = neighborhood.iterator();
+	public void iterateThroughNeighborhood(NeighborhoodState state) {
+		Iterator<FloatType> itor = state.neighborhood.iterator();
 		while (itor.hasNext()) {
 			FloatType t = itor.next();
 			t.add(new FloatType(1.0f));
