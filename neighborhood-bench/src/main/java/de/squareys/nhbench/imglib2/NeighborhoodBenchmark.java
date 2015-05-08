@@ -19,7 +19,6 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.results.format.ResultFormatType;
 import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.format.OutputFormatFactory;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
@@ -71,7 +70,7 @@ public class NeighborhoodBenchmark {
                 .forks(1)
                 .threads(4)
                 .result("result.tex")
-                .resultFormat(ResultFormatType.LATEX)
+                .resultFormat(ResultFormatType.CSV)
                 .build();
         
         new Runner(opt).run();
