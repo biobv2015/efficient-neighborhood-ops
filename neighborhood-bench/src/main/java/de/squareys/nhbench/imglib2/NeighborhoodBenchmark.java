@@ -16,11 +16,9 @@ import org.openjdk.jmh.annotations.Mode;
 import org.openjdk.jmh.annotations.OutputTimeUnit;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.results.format.ResultFormatType;
-import org.openjdk.jmh.runner.Runner;
 import org.openjdk.jmh.runner.RunnerException;
-import org.openjdk.jmh.runner.options.Options;
-import org.openjdk.jmh.runner.options.OptionsBuilder;
+
+import de.squareys.nhbench.main.NeighborhoodBenchmarks;
 
 public class NeighborhoodBenchmark {
 
@@ -63,17 +61,15 @@ public class NeighborhoodBenchmark {
 		}
 	}
 	
+	/**
+	 * Run this benchmark separately.
+	 * 
+	 * @param args
+	 *            do nothing
+	 * @throws RunnerException
+	 *             thrown when jmh runs into trouble
+	 */
 	public static void main(String[] args) throws RunnerException {
-        Options opt = new OptionsBuilder()
-                .include(NeighborhoodBenchmark.class.getSimpleName())
-                .warmupIterations(5)
-                .forks(1)
-                .threads(4)
-                .result("result.tex")
-                .resultFormat(ResultFormatType.CSV)
-                .build();
-        
-        new Runner(opt).run();
-    }
-
+		NeighborhoodBenchmarks.runBenchmark(NeighborhoodBenchmark.class.getSimpleName());
+	}
 }
