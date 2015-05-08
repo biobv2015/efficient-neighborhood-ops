@@ -20,36 +20,72 @@ import org.openjdk.jmh.runner.RunnerException;
 
 import de.squareys.nhbench.main.NeighborhoodBenchmarks;
 
+/**
+ * Benchmark for imglib2 {@link BufferedRectangularNeighborhood}.
+ * 
+ * @author Jonathan Hale (University of Konstanz)
+ */
 public class BufferedRectangularNhBenchmark {
 
+	/**
+	 * State containing an {@link Img}<{@link FloatType}> to remove Img creation
+	 * time from iteration benchmarks.
+	 * 
+	 * @author Jonathan Hale (University of Konstanz)
+	 */
 	@State(Scope.Benchmark)
 	public static class ImgState {
-		public final Img<FloatType> img = new ArrayImgFactory<FloatType>().create(new int[] {
-				100, 100 }, new FloatType());
+		public final Img<FloatType> img = new ArrayImgFactory<FloatType>()
+				.create(new int[] { 100, 100 }, new FloatType());
 	}
-	
+
+	/**
+	 * State containing an {@link Img}<{@link FloatType}> and
+	 * {@link BufferedRectangularNeighborhood} to remove creation time from
+	 * iteration benchmarks.
+	 * 
+	 * @author Jonathan Hale (University of Konstanz)
+	 */
 	@State(Scope.Benchmark)
 	public static class NeighborhoodState extends ImgState {
-		public final Img<FloatType> img = new ArrayImgFactory<FloatType>().create(new int[] {
-				100, 100 }, new FloatType());
+		public final Img<FloatType> img = new ArrayImgFactory<FloatType>()
+				.create(new int[] { 100, 100 }, new FloatType());
 		public final BufferedRectangularNeighborhood<FloatType> neighborhood = new BufferedRectangularNeighborhood<FloatType>(
-				img, new OutOfBoundsBorderFactory<FloatType, RandomAccessibleInterval<FloatType>>(),
+				img,
+				new OutOfBoundsBorderFactory<FloatType, RandomAccessibleInterval<FloatType>>(),
 				new long[] { 3, 3 });
 	}
-	
+
+	/**
+	 * Benchmark the creation of a {@link BufferedRectangularNeighborhood} on a
+	 * {@link Img}<{@link FloatType}>.
+	 * 
+	 * @param imgState
+	 *            set by jmh
+	 * @return something senseless so that the neighborhood wont be optimized
+	 *         out
+	 */
 	@Benchmark
 	@BenchmarkMode(Mode.All)
 	@OutputTimeUnit(TimeUnit.MICROSECONDS)
 	public int createNeighborhood(ImgState imgState) {
 		BufferedRectangularNeighborhood<FloatType> neighborhood = new BufferedRectangularNeighborhood<FloatType>(
-				imgState.img, new OutOfBoundsBorderFactory<FloatType, RandomAccessibleInterval<FloatType>>(),
+				imgState.img,
+				new OutOfBoundsBorderFactory<FloatType, RandomAccessibleInterval<FloatType>>(),
 				new long[] { 3, 3 });
-		
+
 		// use neighborhood so that it doesn't get optimized out
 		// TODO is this really neccessary
 		return (int) (neighborhood.dimension(0) + 1);
 	}
-	
+
+	/**
+	 * Benchmark the time it takes to iterate through the
+	 * {@link BufferedRectangularNeighborhood}.
+	 * 
+	 * @param state
+	 *            set by jmh
+	 */
 	@Benchmark
 	@BenchmarkMode(Mode.All)
 	@OutputTimeUnit(TimeUnit.MICROSECONDS)
@@ -57,10 +93,12 @@ public class BufferedRectangularNhBenchmark {
 		Iterator<FloatType> itor = state.neighborhood.iterator();
 		while (itor.hasNext()) {
 			FloatType t = itor.next();
+
+			// do something with the value to avoid optimizing out
 			t.add(new FloatType(1.0f));
 		}
 	}
-	
+
 	/**
 	 * Run this benchmark separately.
 	 * 
@@ -70,6 +108,8 @@ public class BufferedRectangularNhBenchmark {
 	 *             thrown when jmh runs into trouble
 	 */
 	public static void main(String[] args) throws RunnerException {
-		NeighborhoodBenchmarks.runBenchmark(BufferedRectangularNhBenchmark.class.getSimpleName());
+		NeighborhoodBenchmarks
+				.runBenchmark(BufferedRectangularNhBenchmark.class
+						.getSimpleName());
 	}
 }
