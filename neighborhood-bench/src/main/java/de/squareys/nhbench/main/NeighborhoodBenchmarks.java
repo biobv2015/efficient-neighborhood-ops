@@ -10,6 +10,8 @@ import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
+import de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark;
+
 /**
  * Main class, contains main function and is responsible for running the
  * benchmarks via {@link Runner}.
@@ -25,7 +27,7 @@ public class NeighborhoodBenchmarks {
 	 * List of benchmarks in the project.
 	 */
 	public static List<String> benchmarks = Arrays
-			.asList();
+			.asList(IterateNeighborhoodsBenchmark.class.getSimpleName());
 
 	/**
 	 * Creates a OptionsBuilder with default settings:
