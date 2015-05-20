@@ -10,8 +10,6 @@ import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import de.squareys.nhbench.imglib2.BufferedRectangularNhBenchmark;
-
 /**
  * Main class, contains main function and is responsible for running the
  * benchmarks via {@link Runner}.
@@ -27,7 +25,7 @@ public class NeighborhoodBenchmarks {
 	 * List of benchmarks in the project.
 	 */
 	public static List<String> benchmarks = Arrays
-			.asList(BufferedRectangularNhBenchmark.class.getSimpleName());
+			.asList();
 
 	/**
 	 * Creates a OptionsBuilder with default settings:
