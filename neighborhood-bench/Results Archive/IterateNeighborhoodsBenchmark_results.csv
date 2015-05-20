@@ -1,3 +1,9 @@
-"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: iterateType"
-"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,22.925729,1.833468,"ms/op",foreach
-"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,23.833243,1.160194,"ms/op",while
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: iterateType","Param: iteratorType","Param: useOutOfBounds"
+"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,35.995179,2.766751,"ms/op",foreach,safe,true
+"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,23.579886,1.717875,"ms/op",foreach,safe,false
+"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,37.276005,3.512203,"ms/op",foreach,unsafe,true
+"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,23.142723,1.139897,"ms/op",foreach,unsafe,false
+"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,37.714932,2.087711,"ms/op",while,safe,true
+"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,24.226115,1.301244,"ms/op",while,safe,false
+"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,40.593774,3.080769,"ms/op",while,unsafe,true
+"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,23.672123,1.600394,"ms/op",while,unsafe,false

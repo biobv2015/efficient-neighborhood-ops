@@ -3,12 +3,13 @@ package de.squareys.nhbench.imglib2;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.neighborhood.Neighborhood;
 import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.algorithm.neighborhood.RectangleShape.NeighborhoodsIterableInterval;
-import net.imglib2.img.Img;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.view.Views;
 
 import org.openjdk.jmh.annotations.Benchmark;
 import org.openjdk.jmh.annotations.BenchmarkMode;
@@ -24,7 +25,8 @@ import org.openjdk.jmh.runner.RunnerException;
 import de.squareys.nhbench.main.NeighborhoodBenchmarks;
 
 /**
- * Benchmark for iterating through a {@link NeighborhoodsIterableInterval} completely.
+ * Benchmark for iterating through a {@link NeighborhoodsIterableInterval}
+ * completely.
  * 
  * @author Jonathan Hale
  *
@@ -34,14 +36,19 @@ public class IterateNeighborhoodsBenchmark {
 
 	@State(Scope.Benchmark)
 	public static class ImageState {
-		Img<?> img;
+		RandomAccessibleInterval<FloatType> img;
+
+		@Param({ "true", "false" })
+		private String useOutOfBounds;
 
 		@Setup
 		public void setup() {
-			// TODO add another type of img ?
-
 			img = new ArrayImgFactory<FloatType>().create(
 					new long[] { 100, 100 }, new FloatType());
+
+			if (Boolean.parseBoolean(useOutOfBounds)) {
+				img = Views.interval(Views.extendBorder(img), img);
+			}
 		}
 	}
 
@@ -50,6 +57,9 @@ public class IterateNeighborhoodsBenchmark {
 	@Param({ "foreach", "while" })
 	private String iterateType;
 
+	@Param({ "safe", "unsafe" })
+	private String iteratorType;
+
 	/**
 	 * Setup the state of this benchmark.
 	 * 
@@ -57,8 +67,13 @@ public class IterateNeighborhoodsBenchmark {
 	 */
 	@Setup
 	public void setup(ImageState imgState) {
-		neighborhoods = (NeighborhoodsIterableInterval<FloatType>) new RectangleShape(
-				3, true).neighborhoods(imgState.img);
+		if ("safe".equals(iterateType)) {
+			neighborhoods = (NeighborhoodsIterableInterval<FloatType>) new RectangleShape(
+					3, true).neighborhoodsSafe(imgState.img);
+		} else {
+			neighborhoods = (NeighborhoodsIterableInterval<FloatType>) new RectangleShape(
+					3, true).neighborhoods(imgState.img);
+		}
 	}
 
 	@Benchmark
