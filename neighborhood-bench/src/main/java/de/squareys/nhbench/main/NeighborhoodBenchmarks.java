@@ -34,16 +34,17 @@ public class NeighborhoodBenchmarks {
 	 * warmupIterations = 5
 	 * forks = 1
 	 * threads = 4
-	 * result = result.csv
+	 * result = <resultsFilename>.csv
 	 * 
+	 * @param resultsFilename Name of the file to write the output to, without file extension
 	 * @return {@link ChainedOptionsBuilder} with some default settings
 	 */
-	public static ChainedOptionsBuilder createDefaultOptionsBuilder() {
+	public static ChainedOptionsBuilder createDefaultOptionsBuilder(String resultsFilename) {
 		return new OptionsBuilder()
 			.warmupIterations(5)
 			.forks(1)
 			.threads(4)
-			.result("result.csv")
+			.result(resultsFilename + ".csv")
 			.resultFormat(ResultFormatType.CSV);
 	}
 
@@ -56,7 +57,7 @@ public class NeighborhoodBenchmarks {
 	 *             thrown when jmh runs into trouble
 	 */
 	public static void main(String[] args) throws RunnerException {
-		ChainedOptionsBuilder builder = createDefaultOptionsBuilder();
+		ChainedOptionsBuilder builder = createDefaultOptionsBuilder(NeighborhoodBenchmarks.class.getSimpleName() + "_results");
 
 		for (String benchmarkName : benchmarks) {
 			builder.include(benchmarkName);
@@ -71,12 +72,24 @@ public class NeighborhoodBenchmarks {
 	 * Method to run a single benchmark.
 	 * 
 	 * @param simpleName
+	 * @param resultsFilename name of the output file, without file extension
+	 * @throws RunnerException
+	 *             thrown when jmh runs into trouble
+	 */
+	public static void runBenchmark(String simpleName, String resultsFilename) throws RunnerException {
+		Options opt = createDefaultOptionsBuilder(resultsFilename).include(simpleName).build();
+		
+		new Runner(opt).run();
+	}
+	
+	/**
+	 * Method to run a single benchmark.
+	 * 
+	 * @param simpleName
 	 * @throws RunnerException
 	 *             thrown when jmh runs into trouble
 	 */
 	public static void runBenchmark(String simpleName) throws RunnerException {
-		Options opt = createDefaultOptionsBuilder().include(simpleName).build();
-		
-		new Runner(opt).run();
+		NeighborhoodBenchmarks.runBenchmark(simpleName, simpleName + "_results");
 	}
 }
