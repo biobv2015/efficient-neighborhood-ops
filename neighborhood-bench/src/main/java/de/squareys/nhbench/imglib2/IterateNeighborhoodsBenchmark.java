@@ -28,6 +28,13 @@ import de.squareys.nhbench.main.NeighborhoodBenchmarks;
  * Benchmark for iterating through a {@link NeighborhoodsIterableInterval}
  * completely.
  * 
+ * @param useOutOfBounds
+ *            (true/false) extend the created image with a border
+ * @param iterationType
+ *            (foreach/while) iterate with foreach or while(hasNext)
+ * @param iteratorType
+ *            (safe/unsafe) type of the neighborhoods iterator
+ * 
  * @author Jonathan Hale
  *
  */
@@ -55,7 +62,7 @@ public class IterateNeighborhoodsBenchmark {
 	private NeighborhoodsIterableInterval<FloatType> neighborhoods;
 
 	@Param({ "foreach", "while" })
-	private String iterateType;
+	private String iterationType;
 
 	@Param({ "safe", "unsafe" })
 	private String iteratorType;
@@ -67,7 +74,7 @@ public class IterateNeighborhoodsBenchmark {
 	 */
 	@Setup
 	public void setup(ImageState imgState) {
-		if ("safe".equals(iterateType)) {
+		if ("safe".equals(iterationType)) {
 			neighborhoods = (NeighborhoodsIterableInterval<FloatType>) new RectangleShape(
 					3, true).neighborhoodsSafe(imgState.img);
 		} else {
@@ -80,13 +87,13 @@ public class IterateNeighborhoodsBenchmark {
 	@BenchmarkMode(Mode.AverageTime)
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public void iterateThroughNeighborhood(Blackhole O) {
-		if ("foreach".equals(iterateType)) {
+		if ("foreach".equals(iterationType)) {
 			for (Neighborhood<?> s : neighborhoods) {
 				for (Object t : s) {
 					O.consume(t);
 				}
 			}
-		} else if ("while".equals(iterateType)) {
+		} else if ("while".equals(iterationType)) {
 			Iterator<Neighborhood<FloatType>> outeritor = neighborhoods
 					.iterator();
 
