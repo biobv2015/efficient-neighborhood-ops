@@ -61,18 +61,25 @@ public class IterateNeighborhoodsBenchmark {
 		public void setup() {
 			// for non-outOfBounds, we need to make sure, all iterated pixel can
 			// be accessed.
-			long[] size = new long[] { 100 + 2 * SPAN, 100 + 2 * SPAN };
-			long[] min = new long[] { SPAN, SPAN };
-			long[] max = new long[] { size[0] - SPAN - 1, size[1] - SPAN - 1 };
-
-			RandomAccessible<FloatType> ra = img = new ArrayImgFactory<FloatType>()
-					.create(size, new FloatType());
+			final long[] iteratedAreaSize = { 100, 100 };
 
 			if (Boolean.parseBoolean(useOutOfBounds)) {
-				ra = Views.extendBorder(img);
+				img = Views.interval(Views
+						.extendBorder(new ArrayImgFactory<FloatType>().create(
+								iteratedAreaSize, new FloatType())),
+						new long[] { 0, 0 }, iteratedAreaSize);
+			} else {
+				final long[] size = new long[] {
+						iteratedAreaSize[0] + 2 * SPAN,
+						iteratedAreaSize[1] + 2 * SPAN };
+				final long[] min = new long[] { SPAN, SPAN };
+				final long[] max = new long[] { size[0] - SPAN - 1,
+						size[1] - SPAN - 1 };
+
+				img = Views.interval(new ArrayImgFactory<FloatType>().create(
+						size, new FloatType()), min, max);
 			}
 
-			img = Views.interval(ra, min, max);
 		}
 	}
 
