@@ -3,10 +3,11 @@ package de.squareys.nhbench.imglib2;
 import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 
+import net.imglib2.IterableInterval;
+import net.imglib2.RandomAccessible;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.neighborhood.Neighborhood;
 import net.imglib2.algorithm.neighborhood.RectangleShape;
-import net.imglib2.algorithm.neighborhood.RectangleShape.NeighborhoodsIterableInterval;
 import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
@@ -19,14 +20,13 @@ import org.openjdk.jmh.annotations.Param;
 import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.infra.Blackhole;
 import org.openjdk.jmh.runner.RunnerException;
 
 import de.squareys.nhbench.main.NeighborhoodBenchmarks;
 
 /**
- * Benchmark for iterating through a {@link NeighborhoodsIterableInterval}
- * completely.
+ * Benchmark for iterating through a {@link IterableInterval}<
+ * {@link Neighborhood}<{@link FloatType}>> completely.
  * 
  * @param useOutOfBounds
  *            (true/false) extend the created image with a border
@@ -35,31 +35,48 @@ import de.squareys.nhbench.main.NeighborhoodBenchmarks;
  * @param iteratorType
  *            (safe/unsafe) type of the neighborhoods iterator
  * 
- * @author Jonathan Hale
+ * @author Jonathan Hale (University of Konstanz)
  *
  */
 @State(Scope.Thread)
 public class IterateNeighborhoodsBenchmark {
 
-	@State(Scope.Benchmark)
+	public static final int SPAN = 3;
+
+	/**
+	 * State which creates holds an image. It is Thread Scope, since the pixels
+	 * are incremented during the benchmark, which may result in the JIT
+	 * optimizing access to the image over the execution of multiple benchmarks.
+	 * 
+	 * @author Jonathan Hale (University of Konstanz)
+	 */
+	@State(Scope.Thread)
 	public static class ImageState {
 		RandomAccessibleInterval<FloatType> img;
 
-		@Param({ "true", "false" })
+		@Param({ "false", "true" })
 		private String useOutOfBounds;
 
 		@Setup
 		public void setup() {
-			img = new ArrayImgFactory<FloatType>().create(
-					new long[] { 100, 100 }, new FloatType());
+			// for non-outOfBounds, we need to make sure, all iterated pixel can
+			// be accessed.
+			long[] size = new long[] { 100 + 2 * SPAN, 100 + 2 * SPAN };
+			long[] min = new long[] { SPAN, SPAN };
+			long[] max = new long[] { size[0] - SPAN - 1, size[1] - SPAN - 1 };
+
+			RandomAccessible<FloatType> ra = img = new ArrayImgFactory<FloatType>()
+					.create(size, new FloatType());
 
 			if (Boolean.parseBoolean(useOutOfBounds)) {
-				img = Views.interval(Views.extendBorder(img), img);
+				ra = Views.extendBorder(img);
 			}
+
+			img = Views.interval(ra, min, max);
 		}
 	}
 
-	private NeighborhoodsIterableInterval<FloatType> neighborhoods;
+	private IterableInterval<Neighborhood<FloatType>> neighborhoods;
 
 	@Param({ "foreach", "while" })
 	private String iterationType;
@@ -75,22 +92,26 @@ public class IterateNeighborhoodsBenchmark {
 	@Setup
 	public void setup(ImageState imgState) {
 		if ("safe".equals(iterationType)) {
-			neighborhoods = (NeighborhoodsIterableInterval<FloatType>) new RectangleShape(
-					3, true).neighborhoodsSafe(imgState.img);
+			neighborhoods = new RectangleShape(SPAN, true)
+					.neighborhoodsSafe(imgState.img);
 		} else {
-			neighborhoods = (NeighborhoodsIterableInterval<FloatType>) new RectangleShape(
-					3, true).neighborhoods(imgState.img);
+			neighborhoods = new RectangleShape(SPAN, true)
+					.neighborhoods(imgState.img);
 		}
 	}
 
+	/**
+	 * Iterate through the neighborhoods of all the pixels and increase their
+	 * values by one.
+	 */
 	@Benchmark
 	@BenchmarkMode(Mode.AverageTime)
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
-	public void iterateThroughNeighborhood(Blackhole O) {
+	public void iterateThroughNeighborhood() {
 		if ("foreach".equals(iterationType)) {
-			for (Neighborhood<?> s : neighborhoods) {
-				for (Object t : s) {
-					O.consume(t);
+			for (Neighborhood<FloatType> s : neighborhoods) {
+				for (FloatType t : s) {
+					t.set(t.get() + 1.0f);
 				}
 			}
 		} else if ("while".equals(iterationType)) {
@@ -100,7 +121,8 @@ public class IterateNeighborhoodsBenchmark {
 			while (outeritor.hasNext()) {
 				Iterator<FloatType> inneritor = outeritor.next().iterator();
 				while (inneritor.hasNext()) {
-					O.consume(inneritor.next());
+					FloatType t = inneritor.next();
+					t.set(t.get() + 1.0f);
 				}
 			}
 		}
