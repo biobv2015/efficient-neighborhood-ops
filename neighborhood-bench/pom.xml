@@ -35,24 +35,23 @@
 	</prerequisites>
 
 	<dependencies>
-	
+
 		<dependency>
 			<groupId>org.openjdk.jmh</groupId>
 			<artifactId>jmh-core</artifactId>
 			<version>${jmh.version}</version>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>org.openjdk.jmh</groupId>
 			<artifactId>jmh-generator-annprocess</artifactId>
 			<version>${jmh.version}</version>
 			<scope>provided</scope>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>net.imglib2</groupId>
 			<artifactId>imglib2-algorithm</artifactId>
-			<version>0.2.2-SNAPSHOT</version>
 		</dependency>
 
 		<dependency>
@@ -60,7 +59,7 @@
 			<artifactId>imagej-ops</artifactId>
 			<version>0.12.0</version>
 		</dependency>
-		
+
 	</dependencies>
 
 	<properties>
@@ -69,6 +68,20 @@
 		<javac.target>1.6</javac.target>
 		<uberjar.name>benchmarks</uberjar.name>
 	</properties>
+
+	<dependencyManagement>
+
+		<dependencies>
+
+			<dependency>
+				<groupId>net.imglib2</groupId>
+				<artifactId>imglib2-algorithm</artifactId>
+				<version>0.2.1</version>
+			</dependency>
+
+		</dependencies>
+
+	</dependencyManagement>
 
 	<build>
 		<plugins>
@@ -117,7 +130,26 @@
 			</plugin>
 		</plugins>
 	</build>
-	
+
+	<profiles>
+		<profile>
+			<id>optimized</id>
+			<dependencyManagement>
+
+				<dependencies>
+
+					<dependency>
+						<groupId>net.imglib2</groupId>
+						<artifactId>imglib2-algorithm</artifactId>
+						<version>0.2.2-SNAPSHOT</version>
+					</dependency>
+
+				</dependencies>
+
+			</dependencyManagement>
+		</profile>
+	</profiles>
+
 	<repositories>
 		<!-- NB: for SciJava dependencies -->
 		<repository>
