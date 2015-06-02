@@ -1,9 +1,0 @@
-"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: iterationType","Param: iteratorType","Param: useOutOfBounds"
-"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,11.179879,1.318846,"ms/op",foreach,safe,false
-"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,18.270732,0.088345,"ms/op",foreach,safe,true
-"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,11.033523,0.900330,"ms/op",foreach,unsafe,false
-"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,17.473326,1.330671,"ms/op",foreach,unsafe,true
-"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,11.152661,0.590004,"ms/op",while,safe,false
-"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,16.860214,1.887345,"ms/op",while,safe,true
-"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,11.611145,0.660527,"ms/op",while,unsafe,false
-"de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark.iterateThroughNeighborhood","avgt",4,20.000000,18.106590,0.136269,"ms/op",while,unsafe,true
