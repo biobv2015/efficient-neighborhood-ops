@@ -85,12 +85,9 @@ public class IterateNeighborhoodsBenchmark {
 
 	private IterableInterval<Neighborhood<FloatType>> neighborhoods;
 
-	@Param({ "foreach", "while" })
-	private String iterationType;
-
 	@Param({ "safe", "unsafe" })
 	private String iteratorType;
-	
+
 	@Param({ "false" })
 	private String skipCenter;
 
@@ -101,11 +98,13 @@ public class IterateNeighborhoodsBenchmark {
 	 */
 	@Setup
 	public void setup(ImageState imgState) {
-		if ("safe".equals(iterationType)) {
-			neighborhoods = new RectangleShape(SPAN, Boolean.parseBoolean(skipCenter))
+		if ("safe".equals(iteratorType)) {
+			neighborhoods = new RectangleShape(SPAN,
+					Boolean.parseBoolean(skipCenter))
 					.neighborhoodsSafe(imgState.img);
 		} else {
-			neighborhoods = new RectangleShape(SPAN, Boolean.parseBoolean(skipCenter))
+			neighborhoods = new RectangleShape(SPAN,
+					Boolean.parseBoolean(skipCenter))
 					.neighborhoods(imgState.img);
 		}
 	}
@@ -118,22 +117,9 @@ public class IterateNeighborhoodsBenchmark {
 	@BenchmarkMode(Mode.AverageTime)
 	@OutputTimeUnit(TimeUnit.MILLISECONDS)
 	public void iterateThroughNeighborhood() {
-		if ("foreach".equals(iterationType)) {
-			for (Neighborhood<FloatType> s : neighborhoods) {
-				for (FloatType t : s) {
-					t.set(t.get() + 1.0f);
-				}
-			}
-		} else if ("while".equals(iterationType)) {
-			Iterator<Neighborhood<FloatType>> outeritor = neighborhoods
-					.iterator();
-
-			while (outeritor.hasNext()) {
-				Iterator<FloatType> inneritor = outeritor.next().iterator();
-				while (inneritor.hasNext()) {
-					FloatType t = inneritor.next();
-					t.set(t.get() + 1.0f);
-				}
+		for (Neighborhood<FloatType> s : neighborhoods) {
+			for (FloatType t : s) {
+				t.set(t.get() + 1.0f);
 			}
 		}
 	}
