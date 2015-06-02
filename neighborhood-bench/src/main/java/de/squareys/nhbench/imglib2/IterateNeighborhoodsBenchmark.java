@@ -90,6 +90,9 @@ public class IterateNeighborhoodsBenchmark {
 
 	@Param({ "safe", "unsafe" })
 	private String iteratorType;
+	
+	@Param({ "false" })
+	private String skipCenter;
 
 	/**
 	 * Setup the state of this benchmark.
@@ -99,10 +102,10 @@ public class IterateNeighborhoodsBenchmark {
 	@Setup
 	public void setup(ImageState imgState) {
 		if ("safe".equals(iterationType)) {
-			neighborhoods = new RectangleShape(SPAN, true)
+			neighborhoods = new RectangleShape(SPAN, Boolean.parseBoolean(skipCenter))
 					.neighborhoodsSafe(imgState.img);
 		} else {
-			neighborhoods = new RectangleShape(SPAN, true)
+			neighborhoods = new RectangleShape(SPAN, Boolean.parseBoolean(skipCenter))
 					.neighborhoods(imgState.img);
 		}
 	}
