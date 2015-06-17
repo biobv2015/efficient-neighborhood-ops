@@ -14,8 +14,8 @@ import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
 import net.imglib2.algorithm.neighborhood.Neighborhood;
-import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.algorithm.neighborhood.Shape;
+import net.imglib2.algorithm.neighborhood.old.RectangleShape;
 import net.imglib2.img.ImagePlusAdapter;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.real.FloatType;
@@ -74,21 +74,21 @@ public class MinimumFilterBenchmark {
 			final File file = new File(fileName);
 
 			// open a file with ImageJ
-			image = (Img<FloatType>) new ImgOpener()
-					.openImg(file.getAbsolutePath());
+			image = (Img<FloatType>) new ImgOpener().openImg(file
+					.getAbsolutePath());
 
 			// create a new Image with the same properties
 			output = image.factory().create(image, image.firstElement());
-			
+
 			IJ.openImage(MinimumFilter.fileName);
 		}
 	}
 
-	@Param({ "1", "2", "4" })
+	@Param({ "1", "2"/*, "4"*/ })
 	private String sigma;
 	private int sigma_i;
 
-	@Param({ "imglib2", "imagej" })
+	@Param({ "imglib2", "imglib2-optimized", "imagej" })
 	private String library;
 
 	/**
@@ -114,7 +114,7 @@ public class MinimumFilterBenchmark {
 			final IntervalView<FloatType> infinite = Views.interval(
 					Views.extendMirrorSingle(state.image), state.image);
 
-			final Shape shape = new RectangleShape((int) sigma_i, false);
+			final Shape shape = new net.imglib2.algorithm.neighborhood.old.RectangleShape((int) sigma_i, false);
 
 			final RandomAccess<FloatType> ra = state.output.randomAccess();
 
@@ -138,11 +138,41 @@ public class MinimumFilterBenchmark {
 				ra.setPosition(neighborhood);
 				ra.get().set(min);
 			}
-		} else { /* ImageJ1 */
+		} else if ("imagej".equals(library)) { /* ImageJ1 */
 			final ImageStack is = Filters3D.filter(state.im.getImageStack(),
-					Filters3D.MIN, (float) sigma_i, (float) sigma_i, (float) sigma_i);
+					Filters3D.MIN, (float) sigma_i, (float) sigma_i,
+					(float) sigma_i);
 			final ImagePlus ip = new ImagePlus("Minimum_sigma=" + sigma_i, is);
 			state.output = ImagePlusAdapter.wrap(ip);
+		} else if ("imglib2-optimized".equals(library)) {
+			// get mirror view
+			final IntervalView<FloatType> infinite = Views.interval(
+					Views.extendMirrorSingle(state.image), state.image);
+
+			final net.imglib2.algorithm.neighborhood.Shape shape = new net.imglib2.algorithm.neighborhood.RectangleShape((int) sigma_i, false);
+
+			final RandomAccess<FloatType> ra = state.output.randomAccess();
+
+			final FloatType min = new FloatType();
+
+			for (final net.imglib2.algorithm.neighborhood.Neighborhood<FloatType> neighborhood : shape
+					.neighborhoods(infinite)) {
+
+				final Cursor<FloatType> cursor = neighborhood.cursor();
+				min.setReal(min.getMaxValue());
+
+				while (cursor.hasNext()) {
+					cursor.fwd();
+
+					final FloatType val = cursor.get();
+					if (val.compareTo(min) < 0) {
+						min.set(val);
+					}
+				}
+
+				ra.setPosition(neighborhood);
+				ra.get().set(min);
+			}
 		}
 	}
 
