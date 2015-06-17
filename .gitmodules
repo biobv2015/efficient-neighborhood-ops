@@ -1,0 +1,4 @@
+[submodule "imglib2-algorithm"]
+	path = imglib2-algorithm
+	url = https://github.com/Squareys/imglib2-algorithm.git
+	branch = neighborhood-opt
