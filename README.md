@@ -26,4 +26,14 @@ Attempts for Optimization
  - **dim0-opt**: Very small optimization providing a final shortcut for access to `dimensions[ 0 ]` in RectangleNeighborhoodCursor. See [this commit](https://github.com/Squareys/imglib2-algorithm/commit/94513c19ef65cc7968b9c5b30554d83b03c21161). Speedup was ~2-4%, should be actually verified by some new benchmark results, though.
  - **co-opt**: Have the structuring element stored as a set of concecutive offests. An approach wich was used in some imglib before. Problem here was that the random accessible was always moved with `ra.move()` which obviously is mildly inefficient for RA's with optimized `fwd()` methods. The next optimization attemp tried to get rid of this:
  - **cmo-opt**: Have the structuring element stored as a set of conecutive move operations, therefore, Operations which move the random accessible correctly. This removes need for `nextLine()`, but was not efficient at all. Speedup was ~(-100)%.
- - **racarr-opt**: Use an array of RandomAccess as a structuring element. This way, the structuring element could be moved with the cursor once. Since one usually only iterates over it once, this is not a use case we should optimize for. Speedup ~(-300)% for MinimumFinder benchmark. See [this commit](https://github.com/Squareys/imglib2-algorithm/commit/5bce45bf3c1dbdbf77ebee14cda45117652075f8)
+ - **racarr-opt**: Use an array of RandomAccess as a structuring element. This way, the structuring element could be moved with the cursor once. Since one usually only iterates over it once, this is not a use case we should optimize for. Speedup ~(-300)% for MinimumFinder benchmark. See [this commit](https://github.com/Squareys/imglib2-algorithm/commit/5bce45bf3c1dbdbf77ebee14cda45117652075f8).
+
+* Intermediate conclusion*
+
+The framework for neighborhoods in imglib2-ops provides maxmial flexibility. In return one cannot really go as deep as accessing indices of Types or even work on underlying arrays directly. A structuring element approach could help generalize the API a bit more an would not require a specified implementation of the Shape corresponding Neighborhoods. This comes with performance loss, though. co-opt used an array of array to do the offsets. This was required since indices on img are only accessible though Type, the Neighborhood API works on anything, though.
+
+Next idea is to optimize for OutOfBounds, therefore ommit the checks on pixels we know only have neighbors inside the actual img.
+
+Later I will move onto imagej2 to implement maps for neighborhoods.
+
+
