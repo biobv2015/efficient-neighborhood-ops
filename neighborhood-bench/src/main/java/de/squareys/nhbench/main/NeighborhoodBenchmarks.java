@@ -107,7 +107,7 @@ public class NeighborhoodBenchmarks {
 	
 	public static String timestamp() {
 		Calendar cal = Calendar.getInstance();
-        SimpleDateFormat sdf = new SimpleDateFormat("YYYY_MM_DD_HH_MM");
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
         return sdf.format(cal.getTime());
 	}
 }
