@@ -43,6 +43,9 @@ public class IterateNeighborhoodsBenchmark {
 
 	public static final int SPAN = 3;
 
+	@Param({ "true", "false" })
+	private String optimized;
+
 	/**
 	 * State which creates holds an image. It is Thread Scope, since the pixels
 	 * are incremented during the benchmark, which may result in the JIT
@@ -99,13 +102,29 @@ public class IterateNeighborhoodsBenchmark {
 	@Setup
 	public void setup(ImageState imgState) {
 		if ("safe".equals(iteratorType)) {
-			neighborhoods = new RectangleShape(SPAN,
-					Boolean.parseBoolean(skipCenter))
-					.neighborhoodsSafe(imgState.img);
+
+			if ("true".equals(optimized)) {
+				neighborhoods = new RectangleShape(SPAN,
+						Boolean.parseBoolean(skipCenter))
+						.neighborhoodsSafe(imgState.img);
+			} else {
+				neighborhoods = new net.imglib2.algorithm.neighborhood.old.RectangleShape(SPAN,
+						Boolean.parseBoolean(skipCenter))
+						.neighborhoodsSafe(imgState.img);
+			}
+			
 		} else {
-			neighborhoods = new RectangleShape(SPAN,
-					Boolean.parseBoolean(skipCenter))
-					.neighborhoods(imgState.img);
+			
+			if ("true".equals(optimized)) {
+				neighborhoods = new RectangleShape(SPAN,
+						Boolean.parseBoolean(skipCenter))
+						.neighborhoods(imgState.img);
+			} else {
+				neighborhoods = new net.imglib2.algorithm.neighborhood.old.RectangleShape(SPAN,
+						Boolean.parseBoolean(skipCenter))
+						.neighborhoods(imgState.img);
+			}
+			
 		}
 	}
 
