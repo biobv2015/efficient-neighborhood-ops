@@ -15,10 +15,12 @@ import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
 import net.imglib2.algorithm.neighborhood.Neighborhood;
 import net.imglib2.algorithm.neighborhood.Shape;
-import net.imglib2.algorithm.neighborhood.old.RectangleShape;
 import net.imglib2.img.ImagePlusAdapter;
 import net.imglib2.img.Img;
+import net.imglib2.img.display.imagej.ImageJFunctions;
+import net.imglib2.img.imageplus.ImagePlusImgFactory;
 import net.imglib2.type.numeric.real.FloatType;
+import net.imglib2.util.ImgUtil;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
@@ -81,6 +83,8 @@ public class MinimumFilterBenchmark {
 			output = image.factory().create(image, image.firstElement());
 
 			IJ.openImage(MinimumFilter.fileName);
+			
+			im = ImageJFunctions.wrap(image, "input");
 		}
 	}
 
@@ -88,7 +92,7 @@ public class MinimumFilterBenchmark {
 	private String sigma;
 	private int sigma_i;
 
-	@Param({ "imglib2", "imglib2-optimized", "imagej" })
+	@Param({ "imagej", "imglib2-optimized", "imglib2"})
 	private String library;
 
 	/**
