@@ -1,6 +1,8 @@
 package de.squareys.nhbench.main;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.List;
 
 import org.openjdk.jmh.results.format.ResultFormatType;
@@ -62,7 +64,7 @@ public class NeighborhoodBenchmarks {
 	 */
 	public static void main(String[] args) throws RunnerException {
 		ChainedOptionsBuilder builder = createDefaultOptionsBuilder(
-				NeighborhoodBenchmarks.class.getSimpleName() + "_results");
+				NeighborhoodBenchmarks.class.getSimpleName() + "_" + timestamp());
 
 		for (String benchmarkName : benchmarks) {
 			builder.include(benchmarkName);
@@ -100,6 +102,12 @@ public class NeighborhoodBenchmarks {
 	 */
 	public static void runBenchmark(String simpleName) throws RunnerException {
 		NeighborhoodBenchmarks
-				.runBenchmark(simpleName, simpleName + "_results");
+				.runBenchmark(simpleName, simpleName + "_" + timestamp());
+	}
+	
+	public static String timestamp() {
+		Calendar cal = Calendar.getInstance();
+        SimpleDateFormat sdf = new SimpleDateFormat("YYYY_MM_DD_HH_MM");
+        return sdf.format(cal.getTime());
 	}
 }
