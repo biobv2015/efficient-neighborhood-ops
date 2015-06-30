@@ -34,8 +34,8 @@ The framework for neighborhoods in imglib2-ops provides maxmial flexibility. In 
 
 Next idea is to optimize for OutOfBounds, therefore ommit the checks on pixels we know only have neighbors inside the actual img.
 
- - *ia-opt*: interval access optimization, for detailed description see commit https://github.com/Squareys/imglib2-algorithm/commit/e82cd068cc1b77a86817633b2dd75ccc125a5926
- - *noob-opt*: "No Out Of Bounds" optimization, hence, if we specify seperate intervals to iterate over sequentially, we do not need to track whether our current position is safe to access. These intervals shoud be either completely "in bounds" or "out of bounds". 
+ - **ia-opt**: interval access optimization, for detailed description see commit https://github.com/Squareys/imglib2-algorithm/commit/e82cd068cc1b77a86817633b2dd75ccc125a5926
+ - **noob-opt**: "No Out Of Bounds" optimization, hence, if we specify seperate intervals to iterate over sequentially, we do not need to track whether our current position is safe to access. These intervals shoud be either completely "in bounds" or "out of bounds". 
 
 After noob-opt is implemented, I will move on to ImageJ to write an efficient implementation of neighborhood maps.
 
