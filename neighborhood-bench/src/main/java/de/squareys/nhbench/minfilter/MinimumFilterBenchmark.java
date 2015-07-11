@@ -4,12 +4,16 @@ import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.plugin.Filters3D;
-import io.scif.img.ImgIOException;
-import io.scif.img.ImgOpener;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import net.imagej.Dataset;
+import net.imagej.ImageJ;
+import net.imagej.ops.Op;
+import net.imagej.ops.Ops;
+import net.imagej.ops.neighborhood.array.MapNeighborhoodNativeType;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
@@ -17,10 +21,9 @@ import net.imglib2.algorithm.neighborhood.Neighborhood;
 import net.imglib2.algorithm.neighborhood.Shape;
 import net.imglib2.img.ImagePlusAdapter;
 import net.imglib2.img.Img;
+import net.imglib2.img.array.ArrayImgFactory;
 import net.imglib2.img.display.imagej.ImageJFunctions;
-import net.imglib2.img.imageplus.ImagePlusImgFactory;
-import net.imglib2.type.numeric.real.FloatType;
-import net.imglib2.util.ImgUtil;
+import net.imglib2.type.numeric.integer.UnsignedByteType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
@@ -39,7 +42,7 @@ import de.squareys.nhbench.main.NeighborhoodBenchmarks;
 
 /**
  * Benchmark for iterating through a {@link IterableInterval}<
- * {@link Neighborhood}<{@link FloatType}>> completely.
+ * {@link Neighborhood}<{@link UnsignedByteType}>> completely.
  * 
  * @param useOutOfBounds
  *            (true/false) extend the created image with a border
@@ -54,6 +57,9 @@ import de.squareys.nhbench.main.NeighborhoodBenchmarks;
 @State(Scope.Thread)
 public class MinimumFilterBenchmark {
 
+	
+	final static ImageJ ij = new ImageJ();
+	
 	/**
 	 * State which creates holds an image. It is Thread Scope, since the pixels
 	 * are incremented during the benchmark, which may result in the JIT
@@ -63,36 +69,47 @@ public class MinimumFilterBenchmark {
 	 */
 	@State(Scope.Benchmark)
 	public static class ImageState {
-		public static String fileName = "./flybrain-32bit.tif";
+		public static String fileName = "./lena_grey.jpeg";
 
-		public Img<FloatType> image;
+		public Img<UnsignedByteType> image;
 		public ImagePlus im;
 
-		public Img<FloatType> output;
-
+		public Img<UnsignedByteType> output;
+		
 		@Setup
-		public void setup() throws ImgIOException {
+		public void setup() throws IOException {
 			// define the file to open
 			final File file = new File(fileName);
 
-			// open a file with ImageJ
-			image = (Img<FloatType>) new ImgOpener().openImg(file
-					.getAbsolutePath());
+			// open the image file
+			Dataset ds = (Dataset) ij.io().open("lena_grey.jpeg");
+			Img<UnsignedByteType> planarin = (Img<UnsignedByteType>) ds.getImgPlus().getImg();
+			image = new ArrayImgFactory<UnsignedByteType>().create(planarin,
+					planarin.firstElement());
+
+			Cursor<UnsignedByteType> c1 = planarin.cursor();
+			Cursor<UnsignedByteType> c2 = image.cursor();
+
+			while (c1.hasNext()) {
+				c2.next().set(c1.next());
+			}
+
+			output = image.factory().create(image, new UnsignedByteType());
 
 			// create a new Image with the same properties
 			output = image.factory().create(image, image.firstElement());
 
 			IJ.openImage(MinimumFilter.fileName);
-			
+
 			im = ImageJFunctions.wrap(image, "input");
 		}
 	}
 
-	@Param({ "1", "2"/*, "4"*/ })
+	@Param({ "1", "2", "4" })
 	private String sigma;
 	private int sigma_i;
 
-	@Param({ "imagej", "imglib2-optimized", "imglib2"})
+	@Param({ "imagej-ops", "imagej1", "imglib2-optimized", "imglib2", })
 	private String library;
 
 	/**
@@ -111,29 +128,30 @@ public class MinimumFilterBenchmark {
 	 */
 	@Benchmark
 	@BenchmarkMode(Mode.AverageTime)
-	@OutputTimeUnit(TimeUnit.MILLISECONDS)
+	@OutputTimeUnit(TimeUnit.MICROSECONDS)
 	public void minimumFilter(ImageState state) {
 		if ("imglib2".equals(library)) {
 			// get mirror view
-			final IntervalView<FloatType> infinite = Views.interval(
+			final IntervalView<UnsignedByteType> infinite = Views.interval(
 					Views.extendMirrorSingle(state.image), state.image);
 
-			final Shape shape = new net.imglib2.algorithm.neighborhood.old.RectangleShape((int) sigma_i, false);
+			final Shape shape = new net.imglib2.algorithm.neighborhood.old.RectangleShape(
+					(int) sigma_i, false);
 
-			final RandomAccess<FloatType> ra = state.output.randomAccess();
+			final RandomAccess<UnsignedByteType> ra = state.output.randomAccess();
 
-			final FloatType min = new FloatType();
+			final UnsignedByteType min = new UnsignedByteType();
 
-			for (final Neighborhood<FloatType> neighborhood : shape
+			for (final Neighborhood<UnsignedByteType> neighborhood : shape
 					.neighborhoods(infinite)) {
 
-				final Cursor<FloatType> cursor = neighborhood.cursor();
+				final Cursor<UnsignedByteType> cursor = neighborhood.cursor();
 				min.setReal(min.getMaxValue());
 
 				while (cursor.hasNext()) {
 					cursor.fwd();
 
-					final FloatType val = cursor.get();
+					final UnsignedByteType val = cursor.get();
 					if (val.compareTo(min) < 0) {
 						min.set(val);
 					}
@@ -150,25 +168,26 @@ public class MinimumFilterBenchmark {
 			state.output = ImagePlusAdapter.wrap(ip);
 		} else if ("imglib2-optimized".equals(library)) {
 			// get mirror view
-			final IntervalView<FloatType> infinite = Views.interval(
+			final IntervalView<UnsignedByteType> infinite = Views.interval(
 					Views.extendMirrorSingle(state.image), state.image);
 
-			final net.imglib2.algorithm.neighborhood.Shape shape = new net.imglib2.algorithm.neighborhood.RectangleShape((int) sigma_i, false);
+			final net.imglib2.algorithm.neighborhood.Shape shape = new net.imglib2.algorithm.neighborhood.RectangleShape(
+					(int) sigma_i, false);
 
-			final RandomAccess<FloatType> ra = state.output.randomAccess();
+			final RandomAccess<UnsignedByteType> ra = state.output.randomAccess();
 
-			final FloatType min = new FloatType();
+			final UnsignedByteType min = new UnsignedByteType();
 
-			for (final net.imglib2.algorithm.neighborhood.Neighborhood<FloatType> neighborhood : shape
+			for (final net.imglib2.algorithm.neighborhood.Neighborhood<UnsignedByteType> neighborhood : shape
 					.neighborhoods(infinite)) {
 
-				final Cursor<FloatType> cursor = neighborhood.cursor();
+				final Cursor<UnsignedByteType> cursor = neighborhood.cursor();
 				min.setReal(min.getMaxValue());
 
 				while (cursor.hasNext()) {
 					cursor.fwd();
 
-					final FloatType val = cursor.get();
+					final UnsignedByteType val = cursor.get();
 					if (val.compareTo(min) < 0) {
 						min.set(val);
 					}
@@ -177,6 +196,13 @@ public class MinimumFilterBenchmark {
 				ra.setPosition(neighborhood);
 				ra.get().set(min);
 			}
+		} else if ("imagej-ops".equals(library)) {
+			final Op op = ij.op().op(MapNeighborhoodNativeType.class, state.output,
+					state.image, ij.op().op(Ops.Min.class,
+							state.output.firstElement(), Iterable.class),
+					sigma_i);
+
+			op.run();
 		}
 	}
 
