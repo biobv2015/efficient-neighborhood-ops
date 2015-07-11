@@ -32,8 +32,8 @@ public class NeighborhoodBenchmarks {
 	 */
 	public static List<String> benchmarks = Arrays.asList(
 			IterateNeighborhoodsBenchmark.class.getSimpleName(),
-			MinimumFilterBenchmark.class.getSimpleName(),
-			CreateShapeBenchmark.class.getSimpleName());
+			MinimumFilterBenchmark.class.getSimpleName()
+			/* CreateShapeBenchmark.class.getSimpleName() */);
 
 	/**
 	 * Creates a OptionsBuilder with default settings: warmupIterations = 5
