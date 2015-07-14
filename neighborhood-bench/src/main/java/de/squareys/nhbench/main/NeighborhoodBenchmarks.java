@@ -12,9 +12,8 @@ import org.openjdk.jmh.runner.options.ChainedOptionsBuilder;
 import org.openjdk.jmh.runner.options.Options;
 import org.openjdk.jmh.runner.options.OptionsBuilder;
 
-import de.squareys.nhbench.imglib2.CreateShapeBenchmark;
-import de.squareys.nhbench.imglib2.IterateNeighborhoodsBenchmark;
 import de.squareys.nhbench.minfilter.MinimumFilterBenchmark;
+import de.squareys.nhbench.minfilter.MinimumFilterBenchmark2D;
 
 /**
  * Main class, contains main function and is responsible for running the
@@ -31,8 +30,9 @@ public class NeighborhoodBenchmarks {
 	 * List of benchmarks in the project.
 	 */
 	public static List<String> benchmarks = Arrays.asList(
-			IterateNeighborhoodsBenchmark.class.getSimpleName(),
-			MinimumFilterBenchmark.class.getSimpleName()
+//			IterateNeighborhoodsBenchmark.class.getSimpleName(),
+			MinimumFilterBenchmark.class.getSimpleName(),
+			MinimumFilterBenchmark2D.class.getSimpleName()
 			/* CreateShapeBenchmark.class.getSimpleName() */);
 
 	/**
