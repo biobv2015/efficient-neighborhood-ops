@@ -1,5 +1,6 @@
 package de.squareys.nhbench.minfilter;
 
+import de.squareys.nhbench.main.NeighborhoodBenchmarks;
 import ij.IJ;
 import ij.ImagePlus;
 import ij.ImageStack;
@@ -13,7 +14,7 @@ import net.imagej.Dataset;
 import net.imagej.ImageJ;
 import net.imagej.ops.Op;
 import net.imagej.ops.Ops;
-import net.imagej.ops.neighborhood.array.MapNeighborhoodNativeType;
+import net.imagej.ops.map.neighborhood.array.MapNeighborhoodNativeType;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
@@ -40,7 +41,6 @@ import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
 import sandbox.MinimumFilter;
-import de.squareys.nhbench.main.NeighborhoodBenchmarks;
 
 /**
  * Benchmark for iterating through a {@link IterableInterval}<
@@ -203,7 +203,7 @@ public class MinimumFilterBenchmark2D {
 					MapNeighborhoodNativeType.class,
 					state.output,
 					state.image,
-					ij.op().op(Ops.Min.class, state.output.firstElement(),
+					ij.op().op(Ops.Stats.Min.class, state.output.firstElement(),
 							Iterable.class), sigma_i);
 
 			op.run();

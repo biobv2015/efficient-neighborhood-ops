@@ -108,9 +108,9 @@ public class IterateNeighborhoodsBenchmark {
 						Boolean.parseBoolean(skipCenter))
 						.neighborhoodsSafe(imgState.img);
 			} else {
-				neighborhoods = new net.imglib2.algorithm.neighborhood.old.RectangleShape(SPAN,
-						Boolean.parseBoolean(skipCenter))
-						.neighborhoodsSafe(imgState.img);
+//				neighborhoods = new net.imglib2.algorithm.neighborhood.old.RectangleShape(SPAN,
+//						Boolean.parseBoolean(skipCenter))
+//						.neighborhoodsSafe(imgState.img);
 			}
 			
 		} else {
@@ -120,9 +120,9 @@ public class IterateNeighborhoodsBenchmark {
 						Boolean.parseBoolean(skipCenter))
 						.neighborhoods(imgState.img);
 			} else {
-				neighborhoods = new net.imglib2.algorithm.neighborhood.old.RectangleShape(SPAN,
-						Boolean.parseBoolean(skipCenter))
-						.neighborhoods(imgState.img);
+//				neighborhoods = new net.imglib2.algorithm.neighborhood.old.RectangleShape(SPAN,
+//						Boolean.parseBoolean(skipCenter))
+//						.neighborhoods(imgState.img);
 			}
 			
 		}

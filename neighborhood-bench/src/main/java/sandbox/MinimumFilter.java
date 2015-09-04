@@ -5,27 +5,21 @@ import ij.ImageJ;
 import ij.ImagePlus;
 import ij.ImageStack;
 import ij.Prefs;
-import ij.io.Opener;
 import ij.plugin.Filters3D;
-import ij.util.ThreadUtil;
 import io.scif.img.ImgIOException;
 import io.scif.img.ImgOpener;
 
 import java.io.File;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import net.imglib2.Cursor;
 import net.imglib2.RandomAccess;
 import net.imglib2.algorithm.neighborhood.Neighborhood;
 import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.algorithm.neighborhood.Shape;
-import net.imglib2.algorithm.region.hypersphere.HyperSphere;
-import net.imglib2.algorithm.region.hypersphere.HyperSphereCursor;
 import net.imglib2.img.ImagePlusAdapter;
 import net.imglib2.img.Img;
 import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.type.numeric.real.FloatType;
-import net.imglib2.view.ExtendedRandomAccessibleInterval;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 

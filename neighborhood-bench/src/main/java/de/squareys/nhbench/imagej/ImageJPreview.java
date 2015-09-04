@@ -1,3 +1,4 @@
+
 package de.squareys.nhbench.imagej;
 
 import java.io.IOException;
@@ -5,7 +6,7 @@ import java.io.IOException;
 import net.imagej.Dataset;
 import net.imagej.ImageJ;
 import net.imagej.ops.Ops;
-import net.imagej.ops.threshold.local.methods.LocalMean;
+import net.imagej.ops.threshold.localMean.LocalMean;
 import net.imglib2.Cursor;
 import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.exception.IncompatibleTypeException;
@@ -22,21 +23,21 @@ import net.imglib2.util.Pair;
  * thresholds work more or less alight.
  * 
  * @author Jonathan Hale
- *
  */
 public class ImageJPreview {
 
 	private static final boolean optimized = false;
 
 	public static <T extends NativeType<T>> void main(String[] args)
-			throws IOException, IncompatibleTypeException {
+		throws IOException, IncompatibleTypeException
+	{
 		final ImageJ ij = new ImageJ();
 
 		Dataset ds = (Dataset) ij.io().open("lena_grey.jpeg");
 
 		Img<T> planarin = (Img<T>) ds.getImgPlus().getImg();
-		Img<T> in = new ArrayImgFactory<T>().create(planarin,
-				planarin.firstElement());
+		Img<T> in =
+			new ArrayImgFactory<T>().create(planarin, planarin.firstElement());
 
 		Cursor<T> c1 = planarin.cursor();
 		Cursor<T> c2 = in.cursor();
@@ -45,18 +46,19 @@ public class ImageJPreview {
 			c2.next().set(c1.next());
 		}
 
-		Img<BitType> out = in.factory().imgFactory(new BitType())
-				.create(in, new BitType());
-		Img<BitType> outopt = in.factory().imgFactory(new BitType())
-				.create(in, new BitType());
+		Img<BitType> out =
+			in.factory().imgFactory(new BitType()).create(in, new BitType());
+		Img<BitType> outopt =
+			in.factory().imgFactory(new BitType()).create(in, new BitType());
 
-		ij.op().run(Ops.Threshold.class, out, in,
-				ij.op().op(LocalMean.class, BitType.class, Pair.class, 0.0),
-				new RectangleShape(3, false),
-				new OutOfBoundsMirrorFactory<T, Img<T>>(Boundary.SINGLE));
-		
-		ij.op().run(
-				net.imagej.ops.neighborhood.NeighborhoodWithCenterMap.class,
+		ij.op().threshold().apply(out, in,
+			ij.op().op(LocalMean.class, BitType.class, Pair.class, 0.0),
+			new RectangleShape(3, false),
+			new OutOfBoundsMirrorFactory<T, Img<T>>(Boundary.SINGLE));
+
+		ij.op()
+			.run(
+				net.imagej.ops.map.neighborhood.array.MapNeighborhoodWithCenterNativeType.class,
 				outopt, in,
 				ij.op().op(LocalMean.class, BitType.class, Pair.class, 0.0), 3);
 
