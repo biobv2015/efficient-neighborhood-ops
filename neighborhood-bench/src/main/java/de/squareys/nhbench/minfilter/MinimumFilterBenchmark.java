@@ -14,18 +14,20 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 
 import net.imagej.ImageJ;
-import net.imagej.ops.DefaultOpService;
 import net.imagej.ops.Op;
-import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
 import net.imagej.ops.map.neighborhood.array.MapNeighborhoodNativeType;
+import net.imagej.ops.map.neighborhood.array.MapNeighborhoodNativeTypeExtended;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccess;
 import net.imglib2.algorithm.neighborhood.Neighborhood;
+import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.algorithm.neighborhood.Shape;
 import net.imglib2.img.ImagePlusAdapter;
 import net.imglib2.img.Img;
+import net.imglib2.outofbounds.OutOfBoundsMirrorFactory;
+import net.imglib2.outofbounds.OutOfBoundsMirrorFactory.Boundary;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
@@ -39,7 +41,6 @@ import org.openjdk.jmh.annotations.Scope;
 import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
-import org.scijava.Context;
 
 /**
  * Benchmark for iterating through a {@link IterableInterval}<
@@ -56,6 +57,7 @@ public class MinimumFilterBenchmark {
 	final static ImageJ ij = new ImageJ();
 
 	final static String IMAGEJ_OPS = "imagej-ops";
+	final static String IMAGEJ_OPS_EXTENDED = "imagej-ops-extended";
 	final static String IMGLIB2 = "imglib2";
 	final static String IMAGEJ1 = "imagej";
 
@@ -93,11 +95,12 @@ public class MinimumFilterBenchmark {
 		}
 	}
 
-	@Param({ "1", "2"/* , "4" */})
+	@Param({ "1", "2", "4" })
 	private String sigma;
 	private int sigma_i;
 
-	@Param({ IMAGEJ1, IMAGEJ_OPS, /* "imglib2-optimized", */IMGLIB2 })
+	@Param({ /* IMAGEJ1, */IMAGEJ_OPS, IMAGEJ_OPS_EXTENDED,/* "imglib2-optimized", */
+		IMGLIB2 })
 	private String library;
 
 	/**
@@ -151,7 +154,7 @@ public class MinimumFilterBenchmark {
 				ra.get().set(min);
 			}
 		}
-		
+
 		if (IMAGEJ1.equals(library)) { /* ImageJ1 */
 			Prefs.setThreads(1);
 
@@ -163,7 +166,7 @@ public class MinimumFilterBenchmark {
 			state.output = ImagePlusAdapter.wrap(ip);
 
 		}
-		
+
 		if ("imglib2-optimized".equals(library)) {
 			// get mirror view
 			final IntervalView<FloatType> infinite =
@@ -196,7 +199,7 @@ public class MinimumFilterBenchmark {
 				ra.get().set(min);
 			}
 		}
-		
+
 		if (IMAGEJ_OPS.equals(library)) {
 			final Op op =
 				ij.op().op(
@@ -205,6 +208,19 @@ public class MinimumFilterBenchmark {
 					state.image,
 					ij.op().op(Ops.Stats.Min.class, state.output.firstElement(),
 						Iterable.class), sigma_i);
+
+			op.run();
+		}
+
+		if (IMAGEJ_OPS_EXTENDED.equals(library)) {
+			final Op op =
+				ij.op().op(
+					MapNeighborhoodNativeTypeExtended.class,
+					state.output,
+					state.image,
+					ij.op().op(Ops.Stats.Min.class, state.output.firstElement(),
+						Iterable.class), new RectangleShape(sigma_i, false),
+					new OutOfBoundsMirrorFactory(Boundary.SINGLE));
 
 			op.run();
 		}
