@@ -7,12 +7,11 @@ import ij.ImagePlus;
 import ij.ImageStack;
 import ij.Prefs;
 import ij.plugin.Filters3D;
-import io.scif.img.ImgIOException;
-import io.scif.img.ImgOpener;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import net.imagej.Dataset;
 import net.imagej.ImageJ;
 import net.imagej.ops.Op;
 import net.imagej.ops.Ops;
@@ -26,6 +25,8 @@ import net.imglib2.algorithm.neighborhood.RectangleShape;
 import net.imglib2.algorithm.neighborhood.Shape;
 import net.imglib2.img.ImagePlusAdapter;
 import net.imglib2.img.Img;
+import net.imglib2.img.array.ArrayImgFactory;
+import net.imglib2.img.display.imagej.ImageJFunctions;
 import net.imglib2.outofbounds.OutOfBoundsMirrorFactory;
 import net.imglib2.outofbounds.OutOfBoundsMirrorFactory.Boundary;
 import net.imglib2.type.numeric.real.FloatType;
@@ -42,13 +43,14 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.runner.RunnerException;
 
+import sandbox.MinimumFilter;
+
 /**
  * Benchmark for iterating through a {@link IterableInterval}<
  * {@link Neighborhood}<{@link FloatType}>> completely.
  * 
- * @param useOutOfBounds (true/false) extend the created image with a border
- * @param iterationType (foreach/while) iterate with foreach or while(hasNext)
- * @param iteratorType (safe/unsafe) type of the neighborhoods iterator
+ * @param sigma Size of the neighborhood
+ * @param library Library to perform the minimum filter with
  * @author Jonathan Hale (University of Konstanz)
  */
 @State(Scope.Thread)
@@ -70,8 +72,7 @@ public class MinimumFilterBenchmark {
 	 */
 	@State(Scope.Benchmark)
 	public static class ImageState {
-
-		public static String fileName = "./flybrain-32bit.tif";
+		public static String filename = "./flybrain-32bit.tif";
 
 		public Img<FloatType> image;
 		public ImagePlus im;
@@ -79,19 +80,29 @@ public class MinimumFilterBenchmark {
 		public Img<FloatType> output;
 
 		@Setup
-		public void setup() throws ImgIOException {
-			// define the file to open
-			final File file = new File(fileName);
+		public void setup() throws IOException {
+			// open the image file
+			Dataset ds = (Dataset) ij.io().open(filename);
+			Img<FloatType> planarin = (Img<FloatType>) ds
+					.getImgPlus().getImg();
+			image = new ArrayImgFactory<FloatType>().create(planarin,
+					planarin.firstElement());
 
-			// open a file with ImageJ
-			image = (Img<FloatType>) new ImgOpener().openImg(file.getAbsolutePath());
+			Cursor<FloatType> c1 = planarin.cursor();
+			Cursor<FloatType> c2 = image.cursor();
+
+			while (c1.hasNext()) {
+				c2.next().set(c1.next());
+			}
+
+			output = image.factory().create(image, new FloatType());
 
 			// create a new Image with the same properties
 			output = image.factory().create(image, image.firstElement());
 
-			System.out.println("Opening ij1 image");
-			im = IJ.openImage(fileName);
-			System.out.println("... done");
+			IJ.openImage(MinimumFilter.fileName);
+
+			im = ImageJFunctions.wrap(image, "input");
 		}
 	}
 
@@ -99,8 +110,7 @@ public class MinimumFilterBenchmark {
 	private String sigma;
 	private int sigma_i;
 
-	@Param({ /* IMAGEJ1, */IMAGEJ_OPS, IMAGEJ_OPS_EXTENDED,/* "imglib2-optimized", */
-		IMGLIB2 })
+	@Param({ IMAGEJ_OPS_EXTENDED, IMAGEJ_OPS,	IMGLIB2 })
 	private String library;
 
 	/**

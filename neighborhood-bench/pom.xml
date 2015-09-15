@@ -32,7 +32,7 @@
 
 	<groupId>de.squareys</groupId>
 	<artifactId>neighborhood-bench</artifactId>
-	<version>0.5</version>
+	<version>0.8.0</version>
 	<packaging>jar</packaging>
 
 	<name>Neighborhood Benchmarks</name>
@@ -80,6 +80,7 @@
 		<dependency>
 			<groupId>net.imglib2</groupId>
 			<artifactId>imglib2-algorithm</artifactId>
+			<version>0.3.2-SNAPSHOT</version>
 		</dependency>
 		<dependency>
 			<groupId>net.imglib2</groupId>
