@@ -1,0 +1,19 @@
+"Benchmark","Mode","Threads","Samples","Score","Score Error (99.9%)","Unit","Param: library","Param: sigma"
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark.minimumFilter","avgt",4,20.000000,2292.920996,143.091762,"ms/op",imagej-ops-extended,1
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark.minimumFilter","avgt",4,20.000000,9263.319648,636.436895,"ms/op",imagej-ops-extended,2
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark.minimumFilter","avgt",4,20.000000,47122.435006,956.176316,"ms/op",imagej-ops-extended,4
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark.minimumFilter","avgt",4,20.000000,492.234354,50.990079,"ms/op",imagej-ops,1
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark.minimumFilter","avgt",4,20.000000,1448.860049,110.232580,"ms/op",imagej-ops,2
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark.minimumFilter","avgt",4,20.000000,7139.397811,70.916925,"ms/op",imagej-ops,4
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark.minimumFilter","avgt",4,20.000000,4674.617466,100.703166,"ms/op",imglib2,1
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark.minimumFilter","avgt",4,20.000000,17442.639751,2076.524571,"ms/op",imglib2,2
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark.minimumFilter","avgt",4,20.000000,76368.878813,270.968518,"ms/op",imglib2,4
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark2D.minimumFilter","avgt",4,20.000000,5674.365957,634.607213,"us/op",imagej-ops,1
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark2D.minimumFilter","avgt",4,20.000000,10245.740420,1319.568950,"us/op",imagej-ops,2
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark2D.minimumFilter","avgt",4,20.000000,19620.469856,1408.767206,"us/op",imagej-ops,4
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark2D.minimumFilter","avgt",4,20.000000,22862.226952,2697.301117,"us/op",imglib2-optimized,1
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark2D.minimumFilter","avgt",4,20.000000,54896.592259,4766.445267,"us/op",imglib2-optimized,2
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark2D.minimumFilter","avgt",4,20.000000,122221.469410,6425.239172,"us/op",imglib2-optimized,4
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark2D.minimumFilter","avgt",4,20.000000,24359.495831,3491.206975,"us/op",imglib2,1
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark2D.minimumFilter","avgt",4,20.000000,54810.306322,9992.242723,"us/op",imglib2,2
+"de.squareys.nhbench.minfilter.MinimumFilterBenchmark2D.minimumFilter","avgt",4,20.000000,135781.553767,22254.877606,"us/op",imglib2,4
